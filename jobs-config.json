@@ -2,6 +2,7 @@
   "work_directory": "programs/frozen_light_jobs",
   "data_directory": "data/frozen_light_jobs",
   "cooling_time": 1,
+  "storage_time": 1440,
   "crontab": "0,30 * * * * cd ~/programs/frozen_light_jobs; node get_gpt_output\n5,35 * * * * cd ~/programs/frozen_light_jobs; node convert_text_to_audio\n10,40 * * * * cd ~/programs/frozen_light_jobs; node upload_audios\n15,45 * * * * cd ~/programs/frozen_light_jobs; node upload_records\n0 0 * * * cd ~/programs/frozen_light_jobs; node clean_uploaded",
   "steps": {
 
@@ -16,7 +17,7 @@
       "input": [
         "openai gpt api"
       ],
-      "output_directory": "ready_gpt_text",
+      "output_directory": "gpt_text",
       "outputs": "Text files containing gpt output"
     },
 
@@ -36,7 +37,7 @@
         "azure text to speech api"
       ],
       "outputs": "Audio files",
-      "input_directory": "ready_gpt_text",
+      "input_directory": "gpt_text",
       "output_directory": "ready_to_upload"
     },
 

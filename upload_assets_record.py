@@ -2,6 +2,8 @@ import base64
 import datetime
 import os
 import random
+import shutil
+import time
 
 import ecdsa
 import hashlib
@@ -150,7 +152,7 @@ def upload_asset_data(record_name, url):
     # get home dir
     home_dir = os.path.expanduser("~")
     input_dir = home_dir + "/data/frozen_light_jobs/ready_to_upload/"
-    data_file = input_dir + "6c1831d23a707e34b43d8827f7ea58a3" + ".wav"
+    data_file = input_dir + record_name + ".wav"
     # data_file = input_dir + record_name + ".wav"
 
     # read file and convert it into blob
@@ -247,9 +249,68 @@ def modify_record(record_name, asset_dict):
 #     print(response.text)
 
 
+def get_ready_to_upload_record_names():
+    # read job-config.json into config
+    with open("jobs-config.json") as f:
+        config = json.load(f)
+    cooling_time = config["cooling_time"]
+    print("cooling time: ", cooling_time)
+    # get input directory from config
+    # get home dir
+    home_dir = os.path.expanduser("~")
+    input_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["input_directory"]+"/"
+
+# get all files in the input directory
+    files = os.listdir(input_dir)
+    print("files: ", files)
+    # get all files that are cooled (without file name extension)
+    ready_to_upload_record_names = []
+    for file in files:
+        if file.endswith(".wav"):
+            # get the file name (without extension)
+            file_name = os.path.splitext(file)[0]
+            # get the file creation time
+            file_creation_time = os.path.getctime(input_dir + file)
+            # get current time
+
+            current_time = time.time()
+            # check if the file is cooled
+            if current_time - file_creation_time > cooling_time:
+                ready_to_upload_record_names.append(file_name)
+    print("ready_to_upload: ", ready_to_upload_record_names)
+    return ready_to_upload_record_names
+
+
 if __name__ == '__main__':
-    print("hello world")
-    record_name = random_record_name()
-    url = request_url(record_name, "audio")
-    asset_dict = upload_asset_data(record_name, url)
-    modify_record(record_name, asset_dict)
+    # 1. read and check if there are cooled audio file in the ready_to_upload dir; if there are, put their filename(record_name) in the ready_to_upload array
+    ready_to_upload_record_names = get_ready_to_upload_record_names()
+    if len(ready_to_upload_record_names) == 0:
+        print("There is no ready to upload record.")
+        exit(0)
+
+    # 2. start to upload asset and save record
+    for record_name in ready_to_upload_record_names:
+        print("Start uploading record: ", record_name)
+        url = request_url(record_name, "audio")
+        asset_dict = upload_asset_data(record_name, url)
+        modify_record(record_name, asset_dict)
+
+    # 3. move the uploaded files (audio and json) into the uploaded dir
+
+    # get home dir
+    home_dir = os.path.expanduser("~")
+    input_dir = home_dir + "/data/frozen_light_jobs/ready_to_upload/"
+    output_dir = home_dir + "/data/frozen_light_jobs/last_uploaded/"
+    # if output_dir not exist, create it
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
+
+    for record_name in ready_to_upload_record_names:
+
+
+        # move audio file
+        audio_file = input_dir + record_name + ".wav"
+        shutil.move(audio_file, output_dir)
+        # move json file
+        json_file = input_dir + record_name + ".json"
+        shutil.move(json_file, output_dir)
