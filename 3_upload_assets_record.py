@@ -241,15 +241,15 @@ def modify_record(record_name, asset_dict):
         "recordName": question["recordName"],
         "recordType": question["recordType"],
         "fields": {
-            "question": question_fields["question"],
-            "difficulty": int(question_fields["difficulty"]["value"]),
-            "chinese": question_fields["chinese"],
-            "germany": question_fields["germany"],
-            # "japanese": question_fields["japanese"],
-            # "germanyAcademicVocabulary": question_fields["germanyAcademicVocabulary"],
-            # "japaneseAcademicVocabulary": question_fields["japaneseAcademicVocabulary"],
-            # "academicVocabulary": question_fields["academicVocabulary"],
-            # "audio": asset
+            "question": {"value": question_fields["question"]},
+            "difficulty": {"value": int(question_fields["difficulty"]["value"])},
+            "chinese": {"value": question_fields["chinese"]},
+            "germany": {"value": question_fields["germany"]},
+            # "japanese": {"value": question_fields["japanese"]},
+            # "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
+            # "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
+            # "academicVocabulary": {"value": question_fields["academicVocabulary"]},
+            # "audio": {"value": asset}
         }
     }
 
