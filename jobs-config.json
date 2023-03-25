@@ -75,9 +75,8 @@
       "detailed_steps": [
         "Delete: Delete audio and text files in last_uploaded directory older than 1 day"
       ],
-      "input": [
-        "last_uploaded"
-      ]
+      "input_directory": "last_uploaded"
+
     }
   }
 }
