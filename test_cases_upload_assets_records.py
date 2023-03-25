@@ -56,6 +56,41 @@ def test():
     }
     print("body:", body)
 
+    asset = {}
+    asset["size"] = asset_dict["size"]
+    asset["fileChecksum"] = asset_dict["fileChecksum"]
+    asset["fileName"] = asset_dict["fileName"]
+    if asset_dict["wrappingkey"] is not None:
+        asset["wrappingKey"] = asset_dict["wrappingkey"]
+    if asset_dict["iv"] is not None:
+        asset["iv"] = asset_dict["iv"]
+
+
+    record = {
+        "recordName": question["recordName"],
+        "recordType": question["recordType"],
+        "fields": {
+            "question": {"value": question_fields["question"]},
+            "difficulty": {"value": question_fields["difficulty"]},
+            "chinese": {"value": question_fields["chinese"]},
+            "germany": {"value": question_fields["germany"]},
+            "japanese": {"value": question_fields["japanese"]},
+            "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
+            "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
+            "academicVocabulary": {"value": question_fields["academicVocabulary"]},
+            "audio": {"value": asset}
+        }
+    }
+
+
+    body = {
+        "operations": [{
+            "operationType": "create",
+            "record": record
+
+    }
+
+
 
 test()
 

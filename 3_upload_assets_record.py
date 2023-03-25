@@ -181,6 +181,8 @@ def upload_asset_data(record_name, url):
     asset_dict = response_dict["singleFile"]
 
     print("upload_asset_data finished! Returning asset dict: ", asset_dict)
+    print("response.text: ", response.text)
+
     return asset_dict
 
 
@@ -226,32 +228,32 @@ def modify_record(record_name, asset_dict):
 
     question_fields = question["fields"]
 
+    asset = {"size": asset_dict["size"], "fileChecksum": asset_dict["fileChecksum"], "fileName": asset_dict["fileName"]}
+    if asset_dict["referenceChecksum"] is not None:
+        asset["referenceChecksum"] = asset_dict["referenceChecksum"]
+    if asset_dict["wrappingKey"] is not None:
+        asset["wrappingKey"] = asset_dict["wrappingKey"]
+
+    record = {
+        "recordName": question["recordName"],
+        "recordType": question["recordType"],
+        "fields": {
+            "question": {"value": question_fields["question"]},
+            "difficulty": {"value": question_fields["difficulty"]},
+            "chinese": {"value": question_fields["chinese"]},
+            "germany": {"value": question_fields["germany"]},
+            "japanese": {"value": question_fields["japanese"]},
+            "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
+            "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
+            "academicVocabulary": {"value": question_fields["academicVocabulary"]},
+            "audio": {"value": asset}
+        }
+    }
 
     body = {
         "operations": [{
             "operationType": "create",
-            "record": {
-                "recordName": question["recordName"],
-                "recordType": question["recordType"],
-                "fields": {
-                    "question": {"value": question_fields["question"]},
-                    "difficulty": {"value": question_fields["difficulty"]},
-                    "chinese": {"value": question_fields["chinese"]},
-                    "germany": {"value": question_fields["germany"]},
-                    "japanese": {"value": question_fields["japanese"]},
-                    "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
-                    "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
-                    "academicVocabulary": {"value": question_fields["academicVocabulary"]},
-                    "audio": {
-                        "size": asset_dict["size"],
-                        "fileChecksum": asset_dict["fileChecksum"],
-                        "receipt": asset_dict["receipt"],
-                        "referenceChecksum": asset_dict["referenceChecksum"],
-                        "wrappingKey": asset_dict["wrappingKey"]
-
-                    }
-                }
-            }
+            "record": record,
         }]
     }
 
