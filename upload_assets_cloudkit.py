@@ -132,15 +132,21 @@ def send_request_save_record_with_asset_upload_asset_data(url):
     recordName = "01c4eb03e4c596b0f7db6fc8642f98da"
     data_file = input_dir + recordName + ".wav"
 
+    token_dict = {
+    "recordName": "5e47",
+    "fieldName": "audio",
+    "url": "https://cws.icloud-content.com:443/AuLBz8cBkmOOXapOQtJrmJ_ZQHe4WLQATAErmrGK7Olj5ZefAzYaZCJZyXEBLi9eK-jChzhcQLusc-VxxJH_TneuJR-xC65FD-vw8dyriDwz/singleFileUpload?tk=CAogz-ufwPok9sOH2fvstJeZXDk8IdK_SLvC8YGwq1YFI-YSmAEQ5-Hit_EwGOfRlYryMCIBBCoLAQEDASAD_0cVFYlggICAZGpLS5nxkfx_aGKZ2iiwAlsQImpSV_qTSH-h0frZdZ7v6RcOiQLKtA5_6EVnucmF7vEyJglLTTOURqrHx7JWs9dwZg-fajChMv8hT26VciYrnvEsao1IvgZtIukp_IA_flY3oLMngOPNY_gBSvzn4W0-goJAkg&c=iCloud.com.duskmount.lightfrozen.languagebuddy&z=_defaultZone&uuid=ea240794-eca5-48af-944a-4e4e84bb6b98&dataclass=com.apple.Dataclass.CloudKit&req=1385265414&p=43"
+    }
+
     # read file and convert it into blob
     with open(data_file, 'rb') as f:
         data = f.read()
 
-
-
-
     response = requests.post(
         url,
+        headers={
+    "Content-Type": "text/plain",
+    },
         data=data,
     )
 
