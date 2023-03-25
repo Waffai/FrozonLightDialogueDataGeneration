@@ -12,6 +12,18 @@ import time
 import ecdsa
 import requests
 
+# read job-config.json into config
+with open("jobs-config.json") as f:
+    config = json.load(f)
+cooling_time = config["cooling_time"]
+print("cooling time: ", cooling_time)
+# get input directory from config
+# get home dir
+
+home_dir = os.path.expanduser("~")
+input_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["input_directory"] + "/"
+output_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["output_directory"] + "/"
+
 
 def random_record_name(length=10):
     """Generate a random string of lowercase letters and digits."""
@@ -149,10 +161,8 @@ def upload_asset_data(record_name, url):
     print("record name:", record_name)
     print("url:", url)
     # get home dir
-    home_dir = os.path.expanduser("~")
-    input_dir = home_dir + "/data/frozen_light_jobs/ready_to_upload/"
+
     data_file = input_dir + record_name + ".wav"
-    # data_file = input_dir + record_name + ".wav"
 
     # read file and convert it into blob
     with open(data_file, 'rb') as f:
@@ -210,7 +220,7 @@ def modify_record(record_name, asset_dict):
     action = "modify"
 
     # get question json from [record_name].json
-    input_dir = "/Users/chenmei/data/frozen_light_jobs/ready_to_upload/"
+
     data_file = input_dir + record_name + ".json"
     with open(data_file, 'r') as f:
         question = json.load(f)
@@ -258,15 +268,8 @@ def modify_record(record_name, asset_dict):
 
 
 def get_ready_to_upload_record_names():
-    # read job-config.json into config
-    with open("jobs-config.json") as f:
-        config = json.load(f)
-    cooling_time = config["cooling_time"]
-    print("cooling time: ", cooling_time)
-    # get input directory from config
-    # get home dir
-    home_dir = os.path.expanduser("~")
-    input_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["input_directory"] + "/"
+
+
 
     # get all files in the input directory
     files = os.listdir(input_dir)
@@ -305,10 +308,7 @@ if __name__ == '__main__':
 
     # 3. move the uploaded files (audio and json) into the uploaded dir
 
-    # get home dir
-    home_dir = os.path.expanduser("~")
-    input_dir = home_dir + "/data/frozen_light_jobs/ready_to_upload/"
-    output_dir = home_dir + "/data/frozen_light_jobs/last_uploaded/"
+
     # if output_dir not exist, create it
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
