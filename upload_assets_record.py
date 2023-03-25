@@ -215,7 +215,6 @@ def modify_record(record_name, asset_dict):
     print("Start modifying record...")
     print("record name:", record_name)
     print(asset_dict)
-    record_type = "Questions"
     entity = "records"
     action = "modify"
 
@@ -225,21 +224,23 @@ def modify_record(record_name, asset_dict):
     with open(data_file, 'r') as f:
         question = json.load(f)
 
+    question_fields = question["fields"]
+
     body = {
         "operations": [{
             "operationType": "create",
             "record": {
-                "recordName": record_name,
-                "recordType": record_type,
+                "recordName": question["recordName"],
+                "recordType": question["recordType"],
                 "fields": {
-                    "question": {"value": question.question},
-                    "difficulty": {"value": question.difficulty},
-                    "chinese": {"value": question.chinese},
-                    "germany": {"value": question.germany},
-                    "japanese": {"value": question.japanese},
-                    "germanyAcademicVocabulary": {"value": question.germanyAcademicVocabulary.stringify()},
-                    "japaneseAcademicVocabulary": {"value": question.japaneseAcademicVocabulary.stringify()},
-                    "academicVocabulary": {"value": question.academicVocabulary.stringify()},
+                    "question": {"value": question_fields["question"]},
+                    "difficulty": {"value": question_fields["difficulty"]},
+                    "chinese": {"value": question_fields["chinese"]},
+                    "germany": {"value": question_fields["germany"]},
+                    "japanese": {"value": question_fields["japanese"]},
+                    "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
+                    "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
+                    "academicVocabulary": {"value": question_fields["academicVocabulary"]},
                     "audio": {"value": asset_dict}
                 }
             }
