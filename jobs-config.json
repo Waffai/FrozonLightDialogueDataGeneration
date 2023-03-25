@@ -1,0 +1,82 @@
+{
+  "work_directory": "programs/frozen_light_jobs",
+  "data_directory": "data/frozen_light_jobs",
+  "cooling_time": 1,
+  "crontab": "0,30 * * * * cd ~/programs/frozen_light_jobs; node get_gpt_output\n5,35 * * * * cd ~/programs/frozen_light_jobs; node convert_text_to_audio\n10,40 * * * * cd ~/programs/frozen_light_jobs; node upload_audios\n15,45 * * * * cd ~/programs/frozen_light_jobs; node upload_records\n0 0 * * * cd ~/programs/frozen_light_jobs; node clean_uploaded",
+  "steps": {
+
+    "get_gpt_output": {
+      "description": "Communicate with GPT and save gpt output to text file",
+      "detailed_steps": [
+        "Communicate with GPT",
+        "Get gpt output",
+        "Add recordName: UUID key/value to each gpt output record",
+        "Save: Save gpt output to text file in ready_gpt_text"
+      ],
+      "input": [
+        "openai gpt api"
+      ],
+      "output_directory": "ready_gpt_text",
+      "outputs": "Text files containing gpt output"
+    },
+
+    "convert_text_to_audio": {
+      "description": "Convert text file to audio file using Azure Text to Speech API",
+      "compress_audio": false,
+      "detailed_steps": [
+        "Cooling Checking: Check cooled files (existed more than cooling time) from ready_gpt_text, if found, save the files name in a file name array: converting_audios",
+        "Extract Text: Get text from the saved file array",
+        "Convert Questions: Convert question in text to audio file using Azure Text to Speech API",
+        "Optional Compression: Compress the audio file to mp3 format",
+        "Save: Save audio files to output directory ready_to_upload_audios, the file name is the recordsName from step 1",
+        "Move: Move text files within file name array to ready_to_upload"
+      ],
+      "input": [
+        "Output_from_step1",
+        "azure text to speech api"
+      ],
+      "outputs": "Audio files",
+      "input_directory": "ready_gpt_text",
+      "output_directory": "ready_to_upload"
+    },
+
+    "upload_audios": {
+      "description": "Upload audio files to icloud drive",
+      "detailed_steps": [
+        "Check Cooling: Check cooled audio files (existed more than double cooling time 2*) from ready_to_upload, if found, save the files name in an array: uploading_audios",
+        "Upload: Upload Audio Files: Upload audio files to icloud drive",
+        "Move: Move audio files in uploading_audios array from ready_to_upload to last_uploaded"
+      ],
+      "input": [
+        "ready_to_upload"
+      ],
+      "input_directory": "ready_to_upload",
+      "output_directory": "last_uploaded"
+    },
+
+    "upload_records": {
+      "description": "Upload question records to cloudkit",
+      "detailed_steps": [
+        "Check Cooling: Check cooled gpt texts file (existed more than double cooling time 3*) from ready_to_upload, if found, save the files name in a file name array: uploading_records",
+        "Check audio uploaded: Check audio file uploaded: Check if the audio file is uploaded to icloud drive (if the file name recordName exist in the last_uploaded)",
+        "Upload: If corresponding audio file is uploaded, upload the record to cloudkit, after that save the recordName in an array: uploaded_records",
+        "Move: Move text files from ready_to_upload to last_uploaded"
+      ],
+      "input": [
+        "ready_to_upload"
+      ],
+      "input_directory": "ready_to_upload",
+      "output_directory": "last_uploaded"
+    },
+
+    "clean_uploaded": {
+      "description": "Clean uploaded audio file and text file existed for 1 day",
+      "detailed_steps": [
+        "Delete: Delete audio and text files in last_uploaded directory older than 1 day"
+      ],
+      "input": [
+        "last_uploaded"
+      ]
+    }
+  }
+}
