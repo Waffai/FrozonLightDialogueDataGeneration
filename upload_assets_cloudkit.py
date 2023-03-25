@@ -128,7 +128,7 @@ def send_request_save_record_with_asset_upload_asset_data(url):
 # # get config from reading jobs-config.json
 #     jobs_config = readfile("jobs-config.json")
 
-    input_dir = "/home/woo/data/frozen_light_jobs/ready_to_upload"
+    input_dir = "/home/woo/data/frozen_light_jobs/ready_to_upload/"
     recordName = "01c4eb03e4c596b0f7db6fc8642f98da"
     data_file = input_dir + recordName + ".mp3"
 
