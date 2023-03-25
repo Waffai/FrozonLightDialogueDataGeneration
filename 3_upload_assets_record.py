@@ -249,7 +249,7 @@ def modify_record(record_name, asset_dict):
             # "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
             # "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
             # "academicVocabulary": {"value": question_fields["academicVocabulary"]},
-            # "audio": {"value": asset}
+            "audio": {"value": asset}
         }
     }
 
