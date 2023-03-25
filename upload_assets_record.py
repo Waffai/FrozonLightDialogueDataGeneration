@@ -226,6 +226,7 @@ def modify_record(record_name, asset_dict):
 
     question_fields = question["fields"]
 
+
     body = {
         "operations": [{
             "operationType": "create",
@@ -241,11 +242,19 @@ def modify_record(record_name, asset_dict):
                     "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
                     "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
                     "academicVocabulary": {"value": question_fields["academicVocabulary"]},
-                    "audio": {asset_dict}
+                    "audio": {
+                        "size": asset_dict["size"],
+                        "fileChecksum": asset_dict["fileChecksum"],
+                        "receipt": asset_dict["receipt"],
+                        "referenceChecksum": asset_dict["referenceChecksum"],
+                        "wrappingKey": asset_dict["wrappingKey"]
+
+                    }
                 }
             }
         }]
     }
+
 
     print("body.stringify(): ", json.dumps(body))
     response = send_request(body, entity, action)
