@@ -245,10 +245,10 @@ def modify_record(record_name, asset_dict):
             "difficulty": {"value": question_fields["difficulty"]},
             "chinese": {"value": question_fields["chinese"]},
             "germany": {"value": question_fields["germany"]},
-            "japanese": {"value": question_fields["japanese"]},
-            "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
-            "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
-            "academicVocabulary": {"value": question_fields["academicVocabulary"]},
+            # "japanese": {"value": question_fields["japanese"]},
+            # "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
+            # "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
+            # "academicVocabulary": {"value": question_fields["academicVocabulary"]},
             # "audio": {"value": asset}
         }
     }
