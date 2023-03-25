@@ -228,11 +228,14 @@ def modify_record(record_name, asset_dict):
 
     question_fields = question["fields"]
 
-    asset = {"size": asset_dict["size"], "fileChecksum": asset_dict["fileChecksum"], "fileName": asset_dict["fileName"]}
-    if asset_dict["referenceChecksum"] is not None:
-        asset["referenceChecksum"] = asset_dict["referenceChecksum"]
-    if asset_dict["wrappingKey"] is not None:
-        asset["wrappingKey"] = asset_dict["wrappingKey"]
+    #  asset_dict : "wrappingKey": [WRAPPING_KEY],
+    #                       "fileChecksum" : [FILE_CHECKSUM],
+    #                       "receipt" : [RECEIPT],
+    #                       "referenceChecksum" : [REFERENCE_CHECKSUM],
+    #                       "size": [SIZE]
+    asset = {k: v for k, v in asset_dict.items() if v is not None}
+
+
 
     record = {
         "recordName": question["recordName"],
