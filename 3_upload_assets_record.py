@@ -320,7 +320,7 @@ if __name__ == '__main__':
         url = request_url(record_name, "audio")
         asset_dict = upload_asset_data(record_name, url)
         modify_record(record_name, asset_dict)
-        break
+
 
     # 3. move the uploaded files (audio and json) into the uploaded dir
 
@@ -336,4 +336,4 @@ if __name__ == '__main__':
         # move json file
         json_file = input_dir + record_name + ".json"
         shutil.move(json_file, output_dir)
-        break
+
