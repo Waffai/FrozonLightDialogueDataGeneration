@@ -241,7 +241,7 @@ def modify_record(record_name, asset_dict):
         "recordName": question["recordName"],
         "recordType": question["recordType"],
         "fields": {
-            "question": {"value": question_fields["question"]},
+            "question": question_fields["question"],
             # "difficulty": {"value": int(question_fields["difficulty"]["value"])},
             # "chinese": {"value": question_fields["chinese"]},
             # "germany": {"value": question_fields["germany"]},
