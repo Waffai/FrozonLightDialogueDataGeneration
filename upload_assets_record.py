@@ -77,7 +77,7 @@ def send_request(request_body_json, request_entity, request_action):
     # }
 
     body_text = json.dumps(request_body_json, separators=(',', ':'))
-
+    print("body_text for sign and post as body: ", body_text )
     request_signature = sign(formatted_date, body_text, subpath)
 
     # make a request
@@ -241,14 +241,14 @@ def modify_record(record_name, asset_dict):
                     "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
                     "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
                     "academicVocabulary": {"value": question_fields["academicVocabulary"]},
-                    "audio": {"value": asset_dict}
+                    "audio": {asset_dict}
                 }
             }
         }]
     }
 
+    print("body.stringify(): ", json.dumps(body))
     response = send_request(body, entity, action)
-    response_dict = json.loads(response.text)
     print(response.text)
     print("Uploading record completes.")
 
