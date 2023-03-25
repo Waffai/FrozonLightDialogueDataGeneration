@@ -1,17 +1,16 @@
 import base64
 import datetime
+import hashlib
+import json
 import os
 import random
 import shutil
+# generate a random string for random record name
+import string
 import time
 
 import ecdsa
-import hashlib
-import json
 import requests
-
-# generate a random string for random record name
-import string
 
 
 def random_record_name(length=10):
@@ -207,23 +206,32 @@ def modify_record(record_name, asset_dict):
     print("record name:", record_name)
     print(asset_dict)
     record_type = "Questions"
-
     entity = "records"
     action = "modify"
+
+    # get question json from [record_name].json
+    input_dir = "/Users/chenmei/data/frozen_light_jobs/ready_to_upload/"
+    data_file = input_dir + record_name + ".json"
+    with open(data_file, 'r') as f:
+        question = json.load(f)
+
     body = {
         "operations": [{
             "operationType": "create",
             "record": {
+                "recordName": record_name,
                 "recordType": record_type,
                 "fields": {
-                    "question": {"value": "What is the meaning of life?"},
-                    "difficulty": {"value": 1},
-                    "audio": {
-                        "value": asset_dict
-                    }
-                },
-                "recordName": record_name
-
+                    "question": {"value": question.question},
+                    "difficulty": {"value": question.difficulty},
+                    "chinese": {"value": question.chinese},
+                    "germany": {"value": question.germany},
+                    "japanese": {"value": question.japanese},
+                    "germanyAcademicVocabulary": {"value": question.germanyAcademicVocabulary.stringify()},
+                    "japaneseAcademicVocabulary": {"value": question.japaneseAcademicVocabulary.stringify()},
+                    "academicVocabulary": {"value": question.academicVocabulary.stringify()},
+                    "audio": {"value": asset_dict}
+                }
             }
         }]
     }
@@ -258,9 +266,9 @@ def get_ready_to_upload_record_names():
     # get input directory from config
     # get home dir
     home_dir = os.path.expanduser("~")
-    input_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["input_directory"]+"/"
+    input_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["input_directory"] + "/"
 
-# get all files in the input directory
+    # get all files in the input directory
     files = os.listdir(input_dir)
     print("files: ", files)
     # get all files that are cooled (without file name extension)
@@ -306,8 +314,6 @@ if __name__ == '__main__':
         os.mkdir(output_dir)
 
     for record_name in ready_to_upload_record_names:
-
-
         # move audio file
         audio_file = input_dir + record_name + ".wav"
         shutil.move(audio_file, output_dir)
