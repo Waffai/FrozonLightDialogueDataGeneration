@@ -1,7 +1,7 @@
 {
   "work_directory": "programs/frozen_light_jobs",
   "data_directory": "data/frozen_light_jobs",
-  "cooling_time": 1,
+  "cooling_time": 5,
   "storage_time": 1440,
   "crontab": "0,30 * * * * cd ~/programs/frozen_light_jobs; node get_gpt_output\n5,35 * * * * cd ~/programs/frozen_light_jobs; node convert_text_to_audio\n10,40 * * * * cd ~/programs/frozen_light_jobs; node upload_audios\n15,45 * * * * cd ~/programs/frozen_light_jobs; node upload_records\n0 0 * * * cd ~/programs/frozen_light_jobs; node clean_uploaded",
   "steps": {
@@ -75,9 +75,8 @@
       "detailed_steps": [
         "Delete: Delete audio and text files in last_uploaded directory older than 1 day"
       ],
-      "input": [
-        "last_uploaded"
-      ]
+      "input_directory": "last_uploaded"
+
     }
   }
 }

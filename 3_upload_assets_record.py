@@ -181,6 +181,8 @@ def upload_asset_data(record_name, url):
     asset_dict = response_dict["singleFile"]
 
     print("upload_asset_data finished! Returning asset dict: ", asset_dict)
+    print("response.text: ", response.text)
+
     return asset_dict
 
 
@@ -226,32 +228,35 @@ def modify_record(record_name, asset_dict):
 
     question_fields = question["fields"]
 
+    #  asset_dict : "wrappingKey": [WRAPPING_KEY],
+    #                       "fileChecksum" : [FILE_CHECKSUM],
+    #                       "receipt" : [RECEIPT],
+    #                       "referenceChecksum" : [REFERENCE_CHECKSUM],
+    #                       "size": [SIZE]
+    asset = {k: v for k, v in asset_dict.items() if v is not None}
+
+
+
+    record = {
+        "recordName": question["recordName"],
+        "recordType": question["recordType"],
+        "fields": {
+            "question": question_fields["question"],
+            "difficulty": question_fields["difficulty"],
+            "chinese": question_fields["chinese"],
+            "germany": question_fields["germany"],
+            "japanese": question_fields["japanese"],
+            "germanyAcademicVocabulary": question_fields["germanyAcademicVocabulary"],
+            "japaneseAcademicVocabulary": question_fields["japaneseAcademicVocabulary"],
+            "academicVocabulary": question_fields["academicVocabulary"],
+            "audio": {"value": asset}
+        }
+    }
 
     body = {
         "operations": [{
             "operationType": "create",
-            "record": {
-                "recordName": question["recordName"],
-                "recordType": question["recordType"],
-                "fields": {
-                    "question": {"value": question_fields["question"]},
-                    "difficulty": {"value": question_fields["difficulty"]},
-                    "chinese": {"value": question_fields["chinese"]},
-                    "germany": {"value": question_fields["germany"]},
-                    "japanese": {"value": question_fields["japanese"]},
-                    "germanyAcademicVocabulary": {"value": question_fields["germanyAcademicVocabulary"]},
-                    "japaneseAcademicVocabulary": {"value": question_fields["japaneseAcademicVocabulary"]},
-                    "academicVocabulary": {"value": question_fields["academicVocabulary"]},
-                    "audio": {
-                        "size": asset_dict["size"],
-                        "fileChecksum": asset_dict["fileChecksum"],
-                        "receipt": asset_dict["receipt"],
-                        "referenceChecksum": asset_dict["referenceChecksum"],
-                        "wrappingKey": asset_dict["wrappingKey"]
-
-                    }
-                }
-            }
+            "record": record,
         }]
     }
 
@@ -316,6 +321,7 @@ if __name__ == '__main__':
         asset_dict = upload_asset_data(record_name, url)
         modify_record(record_name, asset_dict)
 
+
     # 3. move the uploaded files (audio and json) into the uploaded dir
 
 
@@ -330,3 +336,4 @@ if __name__ == '__main__':
         # move json file
         json_file = input_dir + record_name + ".json"
         shutil.move(json_file, output_dir)
+
