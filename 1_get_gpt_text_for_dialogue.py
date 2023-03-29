@@ -5,7 +5,7 @@ import string
 from typing import Dict
 
 import openai
-
+from jobs_config import jobs_config
 from config import config
 from scenes_keywords import scenes_keywords
 
@@ -120,10 +120,10 @@ if __name__ == '__main__':
     # Prepare the output dir
     # get home dir in system
     home_dir = os.path.expanduser('~')
-    data_dir = job_config["data_direcotry"]
+    data_dir = jobs_config["data_directory"]
 
     # get output dir
-    output_dir = job_config["get_gpt_text"]["output_dir"]
+    output_dir = jobs_config["steps"]["get_gpt_text"]["output_directory"]
     output_dir = os.path.join(home_dir, data_dir, output_dir)
 
     # if output dir not exist, create it and all parent dirs

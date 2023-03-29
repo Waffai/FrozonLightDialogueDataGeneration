@@ -4,7 +4,7 @@ jobs_config = {
   "cooling_time": 5,
   "storage_time": 1440,
   "steps": {
-    "get_gpt_output": {
+    "get_gpt_text": {
       "description": "Communicate with GPT and save gpt output to text file",
       "detailed_steps": [
         "1. Communicate with GPT, Get gpt output",
@@ -20,7 +20,7 @@ jobs_config = {
 
     "add_audio": {
       "description": "Convert text file to audio file using Azure Text to Speech API",
-      "compress_audio": false,
+      "compress_audio": False,
       "detailed_steps": [
         "Cooling Checking: Check cooled files (existed more than cooling time) from ready_gpt_text, if found, save the files name in a file name array: converting_audios",
         "Extract Text: Get text from the saved file array",
