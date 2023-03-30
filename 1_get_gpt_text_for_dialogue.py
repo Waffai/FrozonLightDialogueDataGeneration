@@ -65,7 +65,11 @@ def generate_dialogue_dict(scenario, keywords, length=6) -> Dict:
     )
 
     print("response message:", response)
-    dialogue = Dict[response.choices[0].message]
+
+
+    message = response["choices"][0]["message"]
+    dialogue = json.loads(message["content"])
+
     return dialogue
 
 
