@@ -63,6 +63,7 @@ def generate_dialogue_dict(scenario, keywords, length=6) -> Dict:
         temperature=0.7,
 
     )
+    print(response)
     dialogue = json.loads(response.choices[0].text)
     return dialogue
 
