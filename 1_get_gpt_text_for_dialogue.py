@@ -52,14 +52,15 @@ def generate_dialogue_dict(scenario, keywords, length=6) -> Dict:
         '}'
     )
 
-
     response = openai.ChatCompletion.create(
-        engine = openai_model,
-        prompt = prompt,
-        max_tokens = 2048,
-        n = 1,
-        stop = None,
-        temperature = 0.7,
+        model=openai_model,
+        messages=[
+            {"role": "assistant", "content": "Please generate a dialogue for the following scenario: "},
+            {"role": "user", "content": prompt}
+        ],
+        n=1,
+        stop=None,
+        temperature=0.7,
 
     )
     dialogue = json.loads(response.choices[0].text)
@@ -70,6 +71,7 @@ def generate_dialogue_dict(scenario, keywords, length=6) -> Dict:
 def write_dict_to_json_file(dict, file_path):
     with open(file_path, 'w') as f:
         json.dump(dict, f, indent=4)
+
 
 def format_dialogue_from_gpt_json_to_cloudkit_json(dialogue: Dict) -> Dict:
     sentence_records_names = []
@@ -143,4 +145,3 @@ if __name__ == '__main__':
 
     # step 2. Format the output to cloudkit format
     format_dialogue_from_gpt_json_to_cloudkit_json(dialogue)
-
