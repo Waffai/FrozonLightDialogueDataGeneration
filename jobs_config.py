@@ -1,18 +1,15 @@
-{
-  "work_directory": "programs/frozen_light_jobs",
-  "data_directory": "data/frozen_light_jobs",
+jobs_config = {
+  "work_directory": "programs/automation_gpt_generated_dialogue",
+  "data_directory": "data/automation_gpt_generated_dialogue/",
   "cooling_time": 5,
   "storage_time": 1440,
-  "crontab": "0,30 * * * * cd ~/programs/frozen_light_jobs; node get_gpt_output\n5,35 * * * * cd ~/programs/frozen_light_jobs; node convert_text_to_audio\n10,40 * * * * cd ~/programs/frozen_light_jobs; node upload_audios\n15,45 * * * * cd ~/programs/frozen_light_jobs; node upload_records\n0 0 * * * cd ~/programs/frozen_light_jobs; node clean_uploaded",
   "steps": {
-
-    "get_gpt_output": {
+    "get_gpt_text": {
       "description": "Communicate with GPT and save gpt output to text file",
       "detailed_steps": [
-        "Communicate with GPT",
-        "Get gpt output",
-        "Add recordName: UUID key/value to each gpt output record",
-        "Save: Save gpt output to text file in ready_gpt_text"
+        "1. Communicate with GPT, Get gpt output",
+        "2. Change output to json format and add recordName: UUID key/value to each gpt output record",
+        "3. Save: Save gpt output in json ready format to text file in ready_gpt_text"
       ],
       "input": [
         "openai gpt api"
@@ -21,9 +18,9 @@
       "outputs": "Text files containing gpt output"
     },
 
-    "convert_text_to_audio": {
+    "add_audio": {
       "description": "Convert text file to audio file using Azure Text to Speech API",
-      "compress_audio": false,
+      "compress_audio": False,
       "detailed_steps": [
         "Cooling Checking: Check cooled files (existed more than cooling time) from ready_gpt_text, if found, save the files name in a file name array: converting_audios",
         "Extract Text: Get text from the saved file array",
@@ -41,27 +38,12 @@
       "output_directory": "ready_to_upload"
     },
 
-    "upload_audios": {
+    "upload_records": {
       "description": "Upload audio files to icloud drive",
       "detailed_steps": [
         "Check Cooling: Check cooled audio files (existed more than double cooling time 2*) from ready_to_upload, if found, save the files name in an array: uploading_audios",
         "Upload: Upload Audio Files: Upload audio files to icloud drive",
         "Move: Move audio files in uploading_audios array from ready_to_upload to last_uploaded"
-      ],
-      "input": [
-        "ready_to_upload"
-      ],
-      "input_directory": "ready_to_upload",
-      "output_directory": "last_uploaded"
-    },
-
-    "upload_records": {
-      "description": "Upload question records to cloudkit",
-      "detailed_steps": [
-        "Check Cooling: Check cooled gpt texts file (existed more than double cooling time 3*) from ready_to_upload, if found, save the files name in a file name array: uploading_records",
-        "Check audio uploaded: Check audio file uploaded: Check if the audio file is uploaded to icloud drive (if the file name recordName exist in the last_uploaded)",
-        "Upload: If corresponding audio file is uploaded, upload the record to cloudkit, after that save the recordName in an array: uploaded_records",
-        "Move: Move text files from ready_to_upload to last_uploaded"
       ],
       "input": [
         "ready_to_upload"
