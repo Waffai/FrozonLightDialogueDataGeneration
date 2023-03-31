@@ -81,10 +81,11 @@ def write_dict_to_json_file(dict, file_path):
 
 def format_dialogue_from_gpt_json_to_cloudkit_json(dialogue: Dict) -> Dict:
     sentence_records_names = []
-    for sentence in dialogue['dialogue']:
+    for i in range(len(dialogue['dialogue'])):
+        sentence = dialogue['dialogue'][i]
         sentence_record = {
             "recordType": "Sentences",
-            "recordName": "sentence_" + generate_record_name(),
+            "recordName": "sentence_" + str(i) + "_" + generate_record_name(),
             "fields": {
                 "speaker": {
                     "value": sentence['speaker']
@@ -99,6 +100,24 @@ def format_dialogue_from_gpt_json_to_cloudkit_json(dialogue: Dict) -> Dict:
         }
         sentence_records_names.append(sentence_record['recordName'])
         write_dict_to_json_file(sentence_record, os.path.join(output_dir, sentence_record['recordName'] + '.json'))
+    # for sentence in dialogue['dialogue']:
+    #     sentence_record = {
+    #         "recordType": "Sentences",
+    #         "recordName": "sentence_" + generate_record_name(),
+    #         "fields": {
+    #             "speaker": {
+    #                 "value": sentence['speaker']
+    #             },
+    #             "en": {
+    #                 "value": sentence['en']
+    #             },
+    #             "cn": {
+    #                 "value": sentence['cn']
+    #             }
+    #         }
+    #     }
+    #     sentence_records_names.append(sentence_record['recordName'])
+    #     write_dict_to_json_file(sentence_record, os.path.join(output_dir, sentence_record['recordName'] + '.json'))
 
     dialogue_record = {
         "recordType": "Dialogues",
