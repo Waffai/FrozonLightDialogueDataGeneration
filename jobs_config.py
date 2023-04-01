@@ -4,7 +4,7 @@ jobs_config = {
   "cooling_time": 5,
   "storage_time": 1440,
   "steps": {
-    "get_gpt_text": {
+    "generate_dialogue": {
       "description": "Communicate with GPT and save gpt output to text file",
       "detailed_steps": [
         "1. Communicate with GPT, Get gpt output",

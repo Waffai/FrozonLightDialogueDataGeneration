@@ -15,6 +15,22 @@ openai.api_key = config['openai_apiKey']
 openai_model = config['openai_model']
 
 
+# Prepare the output dir
+# get home dir in system
+home_dir = os.path.expanduser('~')
+data_dir = home_dir + jobs_config["data_directory"]
+
+# get output dir
+output_dir = data_dir + jobs_config["steps"]["generate_dialogue"]["output_directory"] + "/"
+
+# if output dir not exist, create it and all parent dirs
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+print("output dir:", output_dir)
+
+
+
 def generate_dialogue_dict(scenario, keywords, length=6) -> Dict:
     prompt = (
         f"Please generate a dialogue for the following scenario: {scenario} "
@@ -144,20 +160,7 @@ def generate_record_name():
 
 
 if __name__ == '__main__':
-    # Prepare the output dir
-    # get home dir in system
-    home_dir = os.path.expanduser('~')
-    data_dir = jobs_config["data_directory"]
 
-    # get output dir
-    output_dir = jobs_config["steps"]["get_gpt_text"]["output_directory"]
-    output_dir = os.path.join(home_dir, data_dir, output_dir)
-
-    # if output dir not exist, create it and all parent dirs
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
-    print("output dir:", output_dir)
 
     # step 1. Communicate with GPT, Get gpt output
 
