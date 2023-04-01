@@ -128,12 +128,12 @@ async def main():
         # convert text to audio
         speechSynthesis(text, voiceBySpeaker[speaker], audio_file_path)
 
-        print("Step 3: move the json file to output_dir")
+    print("Step 3: move the json file to output_dir")
 
-        # # move cooled file from input_dir to output_dir
-        for cooled_file in ready_to_convert_dialogue:
-            file_path = os.path.join(input_dir, cooled_file)
-            shutil.move(file_path, output_dir)
+    # # move cooled file from input_dir to output_dir
+    for cooled_file in ready_to_convert_dialogue:
+        file_path = os.path.join(input_dir, cooled_file)
+        shutil.move(file_path, output_dir)
 
 
 asyncio.run(main())
