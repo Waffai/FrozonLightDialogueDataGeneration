@@ -18,7 +18,7 @@ jobs_config = {
       "outputs": "Text files containing gpt output"
     },
 
-    "add_audio": {
+    "add_audios": {
       "description": "Convert text file to audio file using Azure Text to Speech API",
       "compress_audio": False,
       "detailed_steps": [
