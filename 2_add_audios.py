@@ -1,44 +1,27 @@
 import asyncio
 import json
-import random
 import os
+import random
 import shutil
-import string
 import time
 
 import azure.cognitiveservices.speech as speechsdk
 
-from jobs_config import jobs_config
 from config import config
+from jobs_config import jobs_config
 
-print("Preparation: Input and Output dir.")
-input_dir = os.path.join(os.path.expanduser("~"), jobs_config["data_directory"],
-                         jobs_config["steps"]["add_audio"]["input_directory"]) + "/"
+# Prepare the output dir
+data_dir = os.path.expanduser('~') + jobs_config["data_directory"]
+input_dir = data_dir + jobs_config["steps"]["add_audios"]["input_directory"] + "/"
+output_dir = data_dir + jobs_config["steps"]["add_audios"]["output_directory"] + "/"
 
-output_dir = os.path.join(os.path.expanduser("~"), jobs_config["data_directory"],
-                          jobs_config["steps"]["add_audio"]["output_directory"]) + "/"
 cooling_time = jobs_config["cooling_time"]
 
 # if output_dir not exist, create it
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-#
-# speech-voices.json
-# "de-DE-ConradNeural": "German, Germany, Male",
-# "de-DE-ElkeNeural": "German, Germany, Female",
-# "de-DE-GiselaNeural": "German, Germany, Female, Child",
-# "de-DE-KasperNeural": "German, Germany, Male",
-# "de-DE-KatjaNeural": "German, Germany, Female",
-# "en-AU-NatashaNeural": "English, Australia, Female",
-# "en-AU-WilliamNeural": "English, Australia, Male",
-# "en-CA-ClaraNeural": "English, Canada, Female",
-# "en-CA-LiamNeural": "English, Canada, Male",
-# "en-GB-AbbiNeural": "English, United Kingdom, Female",
-# "en-GB-AlfieNeural": "English, United Kingdom, Male",
-# "en-GB-BellaNeural": "English, United Kingdom, Female",
-# "en-GB-ElliotNeural": "English, United Kingdom, Male",
-# "en-GB-EthanNeural": "English, United Kingdom, Male",
+
 # "en-GB-HollieNeural": "English, United Kingdom, Female",
 async def randomVoice(language='English'):
     try:
@@ -50,8 +33,6 @@ async def randomVoice(language='English'):
         return random_voice
     except Exception as e:
         print(e)
-
-
 
 
 def speechSynthesis(text="Hello World",
@@ -79,33 +60,8 @@ def speechSynthesis(text="Hello World",
                     print("Error details: {}".format(cancellation_details.error_details))
                     print("Did you set the speech resource key and region values?")
 
-
-
-
-
-
-
-    #
-    #
-    #     # Create the speech synthesizer.
-    #     synthesizer =SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
-    #
-    #     result = synthesizer.speak_text_async(text).get()
-    #
-    #     if result.reason == speechsdk.ResultReason.SynthesizingAudioCompleted:
-    #         print("synthesis finished.")
-    #     else:
-    #         print(
-    #             f"{voice}: Speech synthesis canceled, {result.error_details}\nDid you set the speech resource key and region values?")
-    #
-    #     synthesizer.close()
-    #     synthesizer = None
     except Exception as ex:
         print("Error in speechSynthesis:", ex)
-
-
-
-
 
 
 def get_cooled_dialogue_json(input_dir, cooling_time):
@@ -125,22 +81,21 @@ def get_cooled_dialogue_json(input_dir, cooling_time):
 
     return cooled_files
 
+
 # main
 async def main():
-
-
     print("Step 1: Cooling Checking: Check cooled files (existed more than cooling time) from ready_gpt_text, " +
           "if found, save the files name in a file name array: converting_audios")
 
     ready_to_convert_dialogue = get_cooled_dialogue_json(input_dir, cooling_time)
 
     print("ready_to_convert_dialogue: ", ready_to_convert_dialogue)
+
     print("Step 2: Convert text to audio: Convert text to audio using Azure Cognitive Services, " +
-            "if success, move the file to output_dir." )
+          "if success, move the file to output_dir.")
 
     # get the voice await
     voiceBySpeaker = {}
-
     # for dialogue in ready_to_convert_dialogue
     for cooled_file in ready_to_convert_dialogue:
         # name start with "sentence", otherwiese skip
@@ -164,7 +119,6 @@ async def main():
         # get the dialogue id
         dialogue_id = sentence_json['recordName']
 
-
         # time.sleep(1)
         # get the audio file name
         audio_file = dialogue_id + '.wav'
@@ -181,7 +135,5 @@ async def main():
             file_path = os.path.join(input_dir, cooled_file)
             shutil.move(file_path, output_dir)
 
+
 asyncio.run(main())
-
-
-

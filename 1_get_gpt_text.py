@@ -16,18 +16,13 @@ openai_model = config['openai_model']
 
 
 # Prepare the output dir
-# get home dir in system
-home_dir = os.path.expanduser('~')
-data_dir = home_dir + jobs_config["data_directory"]
-
-# get output dir
+data_dir = os.path.expanduser('~') + jobs_config["data_directory"]
 output_dir = data_dir + jobs_config["steps"]["generate_dialogue"]["output_directory"] + "/"
 
 # if output dir not exist, create it and all parent dirs
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
-print("output dir:", output_dir)
 
 
 
