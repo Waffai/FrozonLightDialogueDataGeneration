@@ -349,9 +349,12 @@ if __name__ == '__main__':
                 record = json.load(f)
             # upload dialogue record
             upload_dialogues_record(record)
+
+            # move to file to output dir
+            shutil.move(data_file, output_dir)
+
     else:
         print("There is no ready to upload dialogue.")
         exit(0)
 
-    _
     # 4. move the uploaded files (audio and json) into the uploaded dir
