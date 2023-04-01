@@ -2,3 +2,4 @@
 /eckey.pem
 *.pem
 
+*.pyc
