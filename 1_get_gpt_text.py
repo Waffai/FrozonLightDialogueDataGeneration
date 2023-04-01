@@ -85,7 +85,7 @@ def format_dialogue_from_gpt_json_to_cloudkit_json(dialogue: Dict) -> Dict:
         sentence = dialogue['dialogue'][i]
         sentence_record = {
             "recordType": "Sentences",
-            "recordName": "sentence_" + str(i) + "_" + generate_record_name(),
+            "recordName": generate_record_name(),
             "fields": {
                 "speaker": {
                     "value": sentence['speaker']
@@ -121,7 +121,7 @@ def format_dialogue_from_gpt_json_to_cloudkit_json(dialogue: Dict) -> Dict:
 
     dialogue_record = {
         "recordType": "Dialogues",
-        "recordName": "dialogue_" + generate_record_name(),
+        "recordName": generate_record_name(),
         "fields": {
             "dialogue_info": {
                 "value": {

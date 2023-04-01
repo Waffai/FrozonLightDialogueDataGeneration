@@ -11,6 +11,18 @@ import azure.cognitiveservices.speech as speechsdk
 from jobs_config import jobs_config
 from config import config
 
+print("Preparation: Input and Output dir.")
+input_dir = os.path.join(os.path.expanduser("~"), jobs_config["data_directory"],
+                         jobs_config["steps"]["add_audio"]["input_directory"]) + "/"
+
+output_dir = os.path.join(os.path.expanduser("~"), jobs_config["data_directory"],
+                          jobs_config["steps"]["add_audio"]["output_directory"]) + "/"
+cooling_time = jobs_config["cooling_time"]
+
+# if output_dir not exist, create it
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
 #
 # speech-voices.json
 # "de-DE-ConradNeural": "German, Germany, Male",
@@ -112,38 +124,10 @@ def get_cooled_dialogue_json(input_dir, cooling_time):
     cooled_files = [file for file in cooled_files if file.endswith('.json')]
 
     return cooled_files
-#
-# cat sentence_DsTtJO67mT2Hu1J38shz5gZD.json
-# {
-#     "recordType": "Sentences",
-#     "recordName": "sentence_DsTtJO67mT2Hu1J38shz5gZD",
-#     "fields": {
-#         "speaker": {
-#             "value": "staff"
-#         },
-#         "en": {
-#             "value": "Certainly, we have a grilled salmon with a citrus glaze that's been very popular tonight. Would you like to try that?"
-#         },
-#         "cn": {
-#             "value": "\u5f53\u7136\u6709\uff0c\u6211\u4eec\u4eca\u665a\u7684\u7279\u8272\u83dc\u662f\u67da\u5b50\u5473\u7684\u70e4\u4e09\u6587\u9c7c\uff0c\u975e\u5e38\u53d7\u6b22\u8fce\u3002\u60a8\u60f3\u5c1d\u8bd5\u4e00\u4e0b\u5417\uff1f"
-#         }
-#     }
-# # }
-
 
 # main
 async def main():
-    print("Preparation: Input and Output dir.")
-    input_dir = os.path.join(os.path.expanduser("~"), jobs_config["data_directory"],
-                             jobs_config["steps"]["add_audio"]["input_directory"]) + "/"
 
-    output_dir = os.path.join(os.path.expanduser("~"), jobs_config["data_directory"],
-                              jobs_config["steps"]["add_audio"]["output_directory"]) + "/"
-    cooling_time = jobs_config["cooling_time"]
-
-    # if output_dir not exist, create it
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
 
     print("Step 1: Cooling Checking: Check cooled files (existed more than cooling time) from ready_gpt_text, " +
           "if found, save the files name in a file name array: converting_audios")
@@ -160,22 +144,25 @@ async def main():
     # for dialogue in ready_to_convert_dialogue
     for cooled_file in ready_to_convert_dialogue:
         # name start with "sentence", otherwiese skip
-        if not cooled_file.startswith('sentence'):
-            continue
+
         file_path = os.path.join(input_dir, cooled_file)
         # read the json file
         with open(file_path, 'r') as file:
-            dialogue_json = json.load(file)
+            sentence_json = json.load(file)
+
+        # if sentence_json record type not equal to "sentences", skip
+        if sentence_json['recordType'] != 'Sentences':
+            continue
 
         # get the text
-        text = dialogue_json['fields']['en']['value']
+        text = sentence_json['fields']['en']['value']
 
         # get the speaker
-        speaker = dialogue_json['fields']['speaker']['value']
+        speaker = sentence_json['fields']['speaker']['value']
         if voiceBySpeaker.get(speaker) is None:
             voiceBySpeaker[speaker] = await randomVoice()
         # get the dialogue id
-        dialogue_id = dialogue_json['recordName']
+        dialogue_id = sentence_json['recordName']
 
 
         # time.sleep(1)
@@ -189,10 +176,10 @@ async def main():
 
         print("Step 3: move the json file to output_dir")
 
-    # # move cooled file from input_dir to output_dir
-    # for cooled_file in ready_to_convert_dialogue:
-    #     file_path = os.path.join(input_dir, cooled_file)
-    #     shutil.move(file_path, output_dir)
+        # # move cooled file from input_dir to output_dir
+        for cooled_file in ready_to_convert_dialogue:
+            file_path = os.path.join(input_dir, cooled_file)
+            shutil.move(file_path, output_dir)
 
 asyncio.run(main())
 
