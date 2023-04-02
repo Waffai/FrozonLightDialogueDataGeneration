@@ -1,7 +1,7 @@
 jobs_config = {
   "work_directory": "/programs/automation_gpt_generated_dialogue",
   "data_directory": "/data/automation_gpt_generated_dialogue/",
-  "cooling_time": 1,
+  "cooling_time": 5,
   "storage_time": 1440,
   "steps": {
     "generate_dialogue": {
