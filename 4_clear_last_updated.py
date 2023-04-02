@@ -5,7 +5,7 @@ import time
 from jobs_config import jobs_config
 
 home_dir = os.path.expanduser("~")
-input_dir = home_dir + jobs_config["data_directory"] + jobs_config["steps"]["last_uploaded"][
+input_dir = home_dir + jobs_config["data_directory"] + jobs_config["steps"]["clean_uploaded"][
     "input_directory"] + "/"
 storage_time = jobs_config["storage_time"]
 
