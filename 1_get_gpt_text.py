@@ -37,7 +37,7 @@ def generate_dialogue_dict(scenario, keywords, length=6) -> Dict:
         '{'
         '  "dialogue_info": {'
         f'    "scene": "咖啡厅",'
-        f'    "keywords": "咖啡", "拿铁", "卡布奇诺"'
+        f'    "keywords": "咖啡, 拿铁, 卡布奇诺"'
         '     "length": 4,'
         '     "country": "英国",'
         '  },'
@@ -165,7 +165,9 @@ if __name__ == '__main__':
     # get a random scene from scenes_keywords
     scene = random.choice(list(scenes_keywords.keys()))
     # get some random keywords for the scene
-    keywords = random.sample(scenes_keywords[scene], 3)
+    # get a random number of keywords between 2 to 6
+    num_of_keywords = random.randint(2, 6)
+    keywords = random.sample(scenes_keywords[scene], num_of_keywords)
     # generate a dialogue dict
     dialogue = generate_dialogue_dict(scene, keywords)
 
