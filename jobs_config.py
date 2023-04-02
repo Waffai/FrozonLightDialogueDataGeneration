@@ -1,10 +1,10 @@
 jobs_config = {
-  "work_directory": "programs/automation_gpt_generated_dialogue",
-  "data_directory": "data/automation_gpt_generated_dialogue/",
-  "cooling_time": 5,
+  "work_directory": "/programs/automation_gpt_generated_dialogue",
+  "data_directory": "/data/automation_gpt_generated_dialogue/",
+  "cooling_time": 1,
   "storage_time": 1440,
   "steps": {
-    "get_gpt_text": {
+    "generate_dialogue": {
       "description": "Communicate with GPT and save gpt output to text file",
       "detailed_steps": [
         "1. Communicate with GPT, Get gpt output",
@@ -18,7 +18,7 @@ jobs_config = {
       "outputs": "Text files containing gpt output"
     },
 
-    "add_audio": {
+    "add_audios": {
       "description": "Convert text file to audio file using Azure Text to Speech API",
       "compress_audio": False,
       "detailed_steps": [

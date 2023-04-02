@@ -62,7 +62,7 @@ if __name__ == '__main__':
     print_hi('PyCharm')
     #
     # YOUR_KEY_ID = "5e47fc724d2f042a10bfcf69144b147a4194c05fc78e5fa122733e6faeca45b3"
-    # YOUR_PRIVATE_KEY_PATH = "eckey2.pem"
+    # YOUR_PRIVATE_KEY_PATH = "eckey.pem"
     # auth = CloudKitAuth(key_id=YOUR_KEY_ID, key_file_name=YOUR_PRIVATE_KEY_PATH)
     # host = "https://api.apple-cloudkit.com"
     # path = "/database/1/iCloud.com.duskmount.lightfrozen.languagebuddy/development/public/records/modify"

@@ -1,33 +1,16 @@
-import base64
-import datetime
-import hashlib
-import json
+
 import os
-import random
-import shutil
-# generate a random string for random record name
-import string
 import time
 
-import ecdsa
-import requests
+from jobs_config import jobs_config
 
-# read job-config.json into config
-with open("jobs-config.json") as f:
-    config = json.load(f)
-cooling_time = config["cooling_time"]
-print("cooling time: ", cooling_time)
-# get input directory from config
-# get home dir
-
-
+home_dir = os.path.expanduser("~")
+input_dir = home_dir + jobs_config["data_directory"] + jobs_config["steps"]["last_uploaded"][
+    "input_directory"] + "/"
+storage_time = jobs_config["storage_time"]
 
 
 if __name__ == '__main__':
-    home_dir = os.path.expanduser("~")
-    input_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["clean_uploaded"]["input_directory"] + "/"
-    storage_time = config["storage_time"]
-
     # get all files in input_dir
     files = os.listdir(input_dir)
     # get current time

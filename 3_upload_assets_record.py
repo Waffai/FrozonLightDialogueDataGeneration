@@ -12,28 +12,23 @@ import time
 import ecdsa
 import requests
 
-# read job-config.json into config
-with open("jobs-config.json") as f:
-    config = json.load(f)
-cooling_time = config["cooling_time"]
-print("cooling time: ", cooling_time)
-# get input directory from config
-# get home dir
+from jobs_config import jobs_config
+from config import config
 
 home_dir = os.path.expanduser("~")
-input_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["input_directory"] + "/"
-output_dir = home_dir + "/data/frozen_light_jobs/" + config["steps"]["upload_records"]["output_directory"] + "/"
+# input_dir -> home_dir + data_dir + input_dir
+input_dir = home_dir + jobs_config["data_directory"] + jobs_config["steps"]["upload_records"]["input_directory"] + "/"
+output_dir = home_dir + jobs_config["data_directory"] + jobs_config["steps"]["upload_records"]["output_directory"] + "/"
+cooling_time = jobs_config["cooling_time"]
 
-
-def random_record_name(length=10):
-    """Generate a random string of lowercase letters and digits."""
-    chars = string.ascii_lowercase + string.digits
-    return ''.join(random.choice(chars) for _ in range(length))
+# if output_dir not exist, create it
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 
 
 def sign(formatted_date_str: str, body_str: str, subpath_str: str) -> str:
     # 从 PEM 文件中读取私钥
-    with open("eckey2.pem", "rb") as f:
+    with open("eckey.pem", "rb") as f:
         private_key = ecdsa.SigningKey.from_pem(f.read())
 
     # 将请求正文编码为字节序列
@@ -61,23 +56,15 @@ def sign(formatted_date_str: str, body_str: str, subpath_str: str) -> str:
 # POST [path]/database/[version]/[container]/[environment]/[database]/records/lookup
 
 def send_request(request_body_json, request_entity, request_action):
-    keyID = "5e47fc724d2f042a10bfcf69144b147a4194c05fc78e5fa122733e6faeca45b3"
+    keyID = config["cloudkit_keyID"]
     path = "https://api.apple-cloudkit.com"
-    subpath = "/database/1/iCloud.com.duskmount.lightfrozen.languagebuddy/development/public/" + request_entity + "/" + request_action
+    subpath = "/database/1/" + config["cloudkit_containerIdentifier"] + "/development/public/" + request_entity + "/" + request_action
 
     # get current time
     formatted_date = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    # body = {
-    #     "records": [
-    #         {
-    #             "recordName": "5e47fc724d2f042a10bfcf69144b147a4194c05fc78e5fa122733e6faeca45b3"
-    #         }
-    #     ]
-    # }
-
     body_text = json.dumps(request_body_json, separators=(',', ':'))
-    print("body_text for sign and post as body: ", body_text )
+    print("body_text for sign and post as body: ", body_text)
     request_signature = sign(formatted_date, body_text, subpath)
 
     # make a request
@@ -115,7 +102,7 @@ def send_request(request_body_json, request_entity, request_action):
 # }
 
 
-def request_url(record_name, asset_field_name):
+def request_url(record_name, record_type, asset_field_name):
     print("Start requesting url...")
     print("record_name: ", record_name)
     print("asset_field_name: ", asset_field_name)
@@ -125,7 +112,7 @@ def request_url(record_name, asset_field_name):
         "tokens": [
             {
                 "recordName": record_name,
-                "recordType": "Questions",
+                "recordType": record_type,
                 "fieldName": asset_field_name
             }
         ]
@@ -220,13 +207,11 @@ def modify_record(record_name, asset_dict):
     entity = "records"
     action = "modify"
 
-    # get question json from [record_name].json
+    # get record json from [record_name].json
 
     data_file = input_dir + record_name + ".json"
     with open(data_file, 'r') as f:
-        question = json.load(f)
-
-    question_fields = question["fields"]
+        record = json.load(f)
 
     #  asset_dict : "wrappingKey": [WRAPPING_KEY],
     #                       "fileChecksum" : [FILE_CHECKSUM],
@@ -234,24 +219,7 @@ def modify_record(record_name, asset_dict):
     #                       "referenceChecksum" : [REFERENCE_CHECKSUM],
     #                       "size": [SIZE]
     asset = {k: v for k, v in asset_dict.items() if v is not None}
-
-
-
-    record = {
-        "recordName": question["recordName"],
-        "recordType": question["recordType"],
-        "fields": {
-            "question": question_fields["question"],
-            "difficulty": question_fields["difficulty"],
-            "chinese": question_fields["chinese"],
-            "germany": question_fields["germany"],
-            "japanese": question_fields["japanese"],
-            "germanyAcademicVocabulary": question_fields["germanyAcademicVocabulary"],
-            "japaneseAcademicVocabulary": question_fields["japaneseAcademicVocabulary"],
-            "academicVocabulary": question_fields["academicVocabulary"],
-            "audio": {"value": asset}
-        }
-    }
+    record["fields"]["audio"] = {"value": asset}
 
     body = {
         "operations": [{
@@ -259,7 +227,6 @@ def modify_record(record_name, asset_dict):
             "record": record,
         }]
     }
-
 
     print("body.stringify(): ", json.dumps(body))
     response = send_request(body, entity, action)
@@ -282,10 +249,7 @@ def modify_record(record_name, asset_dict):
 #     print(response.text)
 
 
-def get_ready_to_upload_record_names():
-
-
-
+def get_sentences_ready_to_upload():
     # get all files in the input directory
     files = os.listdir(input_dir)
     print("files: ", files)
@@ -307,33 +271,90 @@ def get_ready_to_upload_record_names():
     return ready_to_upload_record_names
 
 
+def get_dialogues_ready_to_upload():
+    # get all files in the input directory
+    files = os.listdir(input_dir)
+    print("files: ", files)
+    # get all files that are cooled (without file name extension)
+    ready_to_upload_record_names = []
+    for file in files:
+        # if file type is not json, skip
+        if not file.endswith(".json"):
+            continue
+        # load file content by json.load
+        content = json.load(open(input_dir + file))
+        if content["recordType"] == "Dialogues":
+            # get the file name (without extension)
+            file_name = os.path.splitext(file)[0]
+            # get the file creation time
+            file_creation_time = os.path.getctime(input_dir + file)
+            # get current time
+            current_time = time.time()
+            # check if the file is cooled
+            if current_time - file_creation_time > cooling_time:
+                ready_to_upload_record_names.append(file_name)
+    print("ready_to_upload: ", ready_to_upload_record_names)
+    return ready_to_upload_record_names
+
+
+def upload_dialogues_record(record):
+
+    record_in_icloud = {
+                            "recordType": "Dialogues",
+                            "recordName": record["recordName"],
+                            "fields": {
+                                "scene": {"value": record["fields"]["dialogue_info"]["value"]["scene"]},
+                                "keywords": {"value": ",".join(record["fields"]["dialogue_info"]["value"]["keywords"])},
+                                "dialogue": {"value": record["fields"]["dialogue"]["value"]}
+                            }
+    }
+
+    body = {
+        "operations": [{
+            "operationType": "create",
+            "record": record_in_icloud
+        }]
+    }
+
+    response = send_request(body, "records", "modify")
+    print("response for upload dialogue", response.text)
+
 if __name__ == '__main__':
     # 1. read and check if there are cooled audio file in the ready_to_upload dir; if there are, put their filename(record_name) in the ready_to_upload array
-    ready_to_upload_record_names = get_ready_to_upload_record_names()
-    if len(ready_to_upload_record_names) == 0:
-        print("There is no ready to upload record.")
+    ready_to_upload_sentences = get_sentences_ready_to_upload()
+    if len(ready_to_upload_sentences) > 0:
+        # 2. upload sentences with assets
+        for record_name in ready_to_upload_sentences:
+            print("Start uploading record: ", record_name)
+            url = request_url(record_name, "Sentences", "audio")
+            asset_dict = upload_asset_data(record_name, url)
+            modify_record(record_name, asset_dict)
+
+            # move audio file
+            audio_file = input_dir + record_name + ".wav"
+            shutil.move(audio_file, output_dir)
+            # move json file
+            json_file = input_dir + record_name + ".json"
+            shutil.move(json_file, output_dir)
+    else:
+        print("There is no ready to upload sentence.")
+
+    # 3. upload dialogue record
+    ready_to_upload_dialogues = get_dialogues_ready_to_upload()
+    if len(ready_to_upload_dialogues) > 0:
+        for record_name in ready_to_upload_dialogues:
+            #read json file
+            data_file = input_dir + record_name + ".json"
+            with open(data_file, 'r') as f:
+                record = json.load(f)
+            # upload dialogue record
+            upload_dialogues_record(record)
+
+            # move to file to output dir
+            shutil.move(data_file, output_dir)
+
+    else:
+        print("There is no ready to upload dialogue.")
         exit(0)
 
-    # 2. start to upload asset and save record
-    for record_name in ready_to_upload_record_names:
-        print("Start uploading record: ", record_name)
-        url = request_url(record_name, "audio")
-        asset_dict = upload_asset_data(record_name, url)
-        modify_record(record_name, asset_dict)
-
-
-    # 3. move the uploaded files (audio and json) into the uploaded dir
-
-
-    # if output_dir not exist, create it
-    if not os.path.exists(output_dir):
-        os.mkdir(output_dir)
-
-    for record_name in ready_to_upload_record_names:
-        # move audio file
-        audio_file = input_dir + record_name + ".wav"
-        shutil.move(audio_file, output_dir)
-        # move json file
-        json_file = input_dir + record_name + ".json"
-        shutil.move(json_file, output_dir)
-
+    # 4. move the uploaded files (audio and json) into the uploaded dir
